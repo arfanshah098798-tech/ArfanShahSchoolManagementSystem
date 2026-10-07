@@ -1,0 +1,361 @@
+package com.arfanshah.schoolmanagement
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContent {
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    SchoolApp()
+                }
+            }
+        }
+    }
+}
+
+enum class UserRole {
+    CHAIRMAN,
+    TEACHER,
+    PARENT
+}
+
+data class Student(
+    val name: String,
+    val fatherName: String,
+    val className: String,
+    val rollNumber: String
+)
+
+@Composable
+fun SchoolApp() {
+    var currentRole by remember { mutableStateOf<UserRole?>(null) }
+    var languageUrdu by remember { mutableStateOf(false) }
+
+    if (currentRole == null) {
+        LoginScreen(
+            languageUrdu = languageUrdu,
+            onLanguageChange = { languageUrdu = !languageUrdu },
+            onLogin = { role -> currentRole = role }
+        )
+    } else {
+        DashboardScreen(
+            role = currentRole!!,
+            languageUrdu = languageUrdu,
+            onLogout = { currentRole = null }
+        )
+    }
+}
+
+@Composable
+fun LoginScreen(
+    languageUrdu: Boolean,
+    onLanguageChange: () -> Unit,
+    onLogin: (UserRole) -> Unit
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "📘 ⭐",
+            fontSize = 42.sp
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = if (languageUrdu)
+                "ارفان شاہ اسکول مینجمنٹ سسٹم"
+            else
+                "Arfan Shah School Management System",
+            fontSize = 21.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = if (languageUrdu) "Demo Star School" else "Demo Star School",
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedButton(onClick = onLanguageChange) {
+            Text(if (languageUrdu) "English" else "اردو")
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = {
+                Text(if (languageUrdu) "موبائل یا ای میل" else "Mobile or Email")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = {
+                Text(if (languageUrdu) "پاس ورڈ" else "Password")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = if (languageUrdu)
+                "Demo login کے لیے نیچے کوئی بھی بٹن دبائیں"
+            else
+                "For demo login, select any role below",
+            fontSize = 13.sp
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = { onLogin(UserRole.CHAIRMAN) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (languageUrdu) "چیئرمین لاگ اِن" else "Chairman Login")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = { onLogin(UserRole.TEACHER) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (languageUrdu) "ٹیچر لاگ اِن" else "Teacher Login")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = { onLogin(UserRole.PARENT) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (languageUrdu) "والدین لاگ اِن" else "Parent Login")
+        }
+    }
+}
+
+@Composable
+fun DashboardScreen(
+    role: UserRole,
+    languageUrdu: Boolean,
+    onLogout: () -> Unit
+) {
+    val students = listOf(
+        Student("Ali Khan", "Ahmed Khan", "5-A", "01"),
+        Student("Ayesha Ahmed", "Rashid Ahmed", "5-A", "02"),
+        Student("Hassan Raza", "Nadeem Raza", "6-A", "03")
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
+        item {
+            Text(
+                text = when (role) {
+                    UserRole.CHAIRMAN ->
+                        if (languageUrdu) "چیئرمین ڈیش بورڈ" else "Chairman Dashboard"
+
+                    UserRole.TEACHER ->
+                        if (languageUrdu) "ٹیچر ڈیش بورڈ" else "Teacher Dashboard"
+
+                    UserRole.PARENT ->
+                        if (languageUrdu) "والدین ڈیش بورڈ" else "Parent Dashboard"
+                },
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Demo Star School",
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+        }
+
+        when (role) {
+            UserRole.CHAIRMAN -> {
+                item {
+                    DashboardCard("Students", "250")
+                    DashboardCard("Teachers", "18")
+                    DashboardCard("Classes", "12")
+                    DashboardCard("Pending Leave Requests", "4")
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Manage Students")
+                    }
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("School Notices")
+                    }
+                }
+            }
+
+            UserRole.TEACHER -> {
+                item {
+                    DashboardCard("My Class", "5-A")
+                    DashboardCard("Today's Attendance", "28 / 30")
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Mark Attendance")
+                    }
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Add Daily Learning")
+                    }
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Add Homework / Tuition Work")
+                    }
+                }
+            }
+
+            UserRole.PARENT -> {
+                item {
+                    Text(
+                        text = "My Child: Ali Khan",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text("Class: 5-A | Roll No: 01")
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    DashboardCard("Today's Attendance", "Present")
+                    DashboardCard(
+                        "Quran Kareem",
+                        "Surah Al-Fatiha, verses 1–3"
+                    )
+                    DashboardCard(
+                        "Homework",
+                        "Revise today's lesson"
+                    )
+                    DashboardCard(
+                        "Teacher Remark",
+                        "Good participation"
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Apply for Leave")
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "Contact Us: 03484728887",
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = onLogout,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
+        }
+    }
+}
+
+@Composable
+fun DashboardCard(title: String, value: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(text = value)
+        }
+    }
+}

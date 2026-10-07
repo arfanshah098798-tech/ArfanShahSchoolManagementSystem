@@ -1,0 +1,15 @@
+Teacher login
+   ↓
+Class select
+   ↓
+Student select
+   ↓
+Attendance mark
+   ↓
+Today's lesson add
+   ↓
+Homework/tuition work add
+   ↓
+Submit
+   ↓
+Parent ke mobile par record show
